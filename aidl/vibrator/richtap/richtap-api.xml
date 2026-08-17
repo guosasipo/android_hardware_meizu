@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <library name="richtap-api" file="/system_ext/framework/richtap-api.jar" />
+</permissions>

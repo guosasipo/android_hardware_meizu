@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.meizu.richtap.bridge">
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application
+        android:allowBackup="false">
+        <provider
+            android:name=".RichTapProvider"
+            android:authorities="com.meizu.richtap.bridge"
+            android:exported="true"
+            android:permission="android.permission.VIBRATE" />
+    </application>
+</manifest>
