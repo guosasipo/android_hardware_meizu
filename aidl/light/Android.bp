@@ -1,0 +1,28 @@
+//
+// SPDX-FileCopyrightText: 2021 The LineageOS Project
+// SPDX-FileCopyrightText: 2026 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_binary {
+    name: "android.hardware.light-service.meizu",
+    vendor: true,
+    relative_install_path: "hw",
+    init_rc: ["android.hardware.light-service.meizu.rc"],
+    vintf_fragments: ["android.hardware.light-service.meizu.xml"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    srcs: [
+        "Lights.cpp",
+        "service.cpp",
+    ],
+    shared_libs: [
+        "android.hardware.light-V2-ndk",
+        "libbase",
+        "libbinder_ndk",
+        "liblog",
+    ],
+}

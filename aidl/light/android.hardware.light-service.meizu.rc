@@ -1,0 +1,5 @@
+service vendor.light-default /vendor/bin/hw/android.hardware.light-service.meizu
+    class hal
+    user system
+    group system
+    shutdown critical
