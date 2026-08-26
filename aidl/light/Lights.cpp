@@ -208,18 +208,11 @@ bool Lights::initialize() {
 
 Color Lights::colorFromState(const HwLightState& state) {
     const uint32_t value = static_cast<uint32_t>(state.color);
-    const uint8_t alpha = (value >> 24) & 0xff;
-    Color color{
+    return Color{
             .red = static_cast<uint8_t>((value >> 16) & 0xff),
             .green = static_cast<uint8_t>((value >> 8) & 0xff),
             .blue = static_cast<uint8_t>(value & 0xff),
     };
-    if (alpha > 0 && alpha < 0xff) {
-        color.red = color.red * alpha / 0xff;
-        color.green = color.green * alpha / 0xff;
-        color.blue = color.blue * alpha / 0xff;
-    }
-    return color;
 }
 
 bool Lights::stateIsLit(const HwLightState& state) {
