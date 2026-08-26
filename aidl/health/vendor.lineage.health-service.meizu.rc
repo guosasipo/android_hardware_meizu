@@ -1,0 +1,6 @@
+service vendor.lineage_health /vendor/bin/hw/vendor.lineage.health-service.meizu
+    class hal
+    user system
+    group system
+    disabled
+    interface aidl vendor.lineage.health.IChargingControl/default
