@@ -21,9 +21,9 @@ interface IRichtapVibrator {
   oneway void init(in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
   oneway void setDynamicScale(in int scale, in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
   oneway void setF0(in int f0, in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
-  void stop(in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
+  oneway void stop(in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
   oneway void setAmplitude(in int amplitude, in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
-  void performHeParam(in int interval, in int amplitude, in int freq, in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
+  oneway void performHeParam(in int interval, in int amplitude, in int freq, in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
   oneway void off(in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
   oneway void on(in int timeoutMs, in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
   int perform(in int effect_id, in byte strength, in vendor.aac.hardware.richtap.vibrator.IRichtapCallback callback);
