@@ -1,0 +1,15 @@
+//
+// SPDX-FileCopyrightText: 2026 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+android_app {
+    name: "MeizuDoze",
+    srcs: ["src/**/*.kt"],
+    certificate: "platform",
+    platform_apis: true,
+    system_ext_specific: true,
+    optimize: {
+        optimize: true,
+    },
+}
