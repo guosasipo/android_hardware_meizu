@@ -1,0 +1,233 @@
+<!--
+    SPDX-FileCopyrightText: 2026 The LineageOS Project
+    SPDX-License-Identifier: Apache-2.0
+-->
+<compatibility-matrix version="9.0" type="framework">
+    <hal format="aidl">
+        <name>vendor.anc.fingerprint.extension</name>
+        <interface>
+            <name>IFingerprintExtension</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.awa.reality</name>
+        <version>3</version>
+        <interface>
+            <name>IRealityTap</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.goodix.hardware.biometrics.fingerprint</name>
+        <interface>
+            <name>IGoodixFingerprintDaemon</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.goodix.hardware.biometrics.fingerprint</name>
+        <version>2.1</version>
+        <interface>
+            <name>IGoodixFingerprintDaemon</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.goodix.hardware.nfc_aidl</name>
+        <interface>
+            <name>IGdxNfc</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.goodix.hardware.secure_element_aidl</name>
+        <interface>
+            <name>IGdxEse</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.hardware.biometrics.fingerprintRbs</name>
+        <version>1-3</version>
+        <interface>
+            <name>IFingerprintRbs</name>
+            <instance>Rbs</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.hardware.meizu.fingerprint.extension</name>
+        <version>1-3</version>
+        <interface>
+            <name>IFingerprintExtension</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.meizu.fido</name>
+        <interface>
+            <name>IFIDO</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.aw_light</name>
+        <version>1.0</version>
+        <interface>
+            <name>IAwLight</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.meizu.hardware.aw_light</name>
+        <interface>
+            <name>IAwLight</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.fbase_defrag</name>
+        <version>1.0</version>
+        <interface>
+            <name>IFbaseDefrag</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.fido</name>
+        <version>1.0</version>
+        <interface>
+            <name>IFIDODaemon</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.fido</name>
+        <version>2.0</version>
+        <interface>
+            <name>IFIDODaemon</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.ifaa</name>
+        <version>1.0</version>
+        <interface>
+            <name>IIFAADaemon</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.meizu_kelog</name>
+        <version>1.0</version>
+        <interface>
+            <name>IMeizuKelog</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.meizu.hardware.meizu_kelog</name>
+        <interface>
+            <name>IMeizuKelog</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.meizu.hardware.qsh_geofence</name>
+        <interface>
+            <name>IQshGeofence</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.smart_scene</name>
+        <version>1.0</version>
+        <interface>
+            <name>ISmartScene</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.hardware.tiktap_hidl</name>
+        <version>1.0</version>
+        <interface>
+            <name>ITiktap</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.meizu.ifaa</name>
+        <interface>
+            <name>IIFAA</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.meizu.sensor_aux</name>
+        <interface>
+            <name>ISensorAux</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.meizu.sensor_aux</name>
+        <version>1.0</version>
+        <interface>
+            <name>ISensorAux</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.smartsoft.hardware.ifaa</name>
+        <interface>
+            <name>IIFAADevice</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.xingji.hal.starCore</name>
+        <version>1.0</version>
+        <interface>
+            <name>IStarCore</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.xingji.hal.starCore</name>
+        <version>1.1</version>
+        <interface>
+            <name>IStarCore</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.xingji.hardware.qsee.store</name>
+        <interface>
+            <name>IQseeStore</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.xingji.hardware.qsee.store</name>
+        <version>1.0</version>
+        <interface>
+            <name>IQseeStore</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.xj.hardware.wifi.supplicant</name>
+        <interface>
+            <name>ISupplicantXj</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>vendor.xjsd.hardware.fingerprint</name>
+        <version>2.1</version>
+        <interface>
+            <name>IXjsdFingerprint</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+</compatibility-matrix>
