@@ -1,0 +1,20 @@
+//
+// SPDX-FileCopyrightText: 2026 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_binary {
+    name: "vendor.meizu.qdp-profile",
+    vendor: true,
+    init_rc: ["vendor.meizu.qdp-profile.rc"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    srcs: ["QdpProfileProvisioner.cpp"],
+    shared_libs: [
+        "libdl",
+        "liblog",
+    ],
+}

@@ -1,0 +1,4 @@
+service vendor.meizu-qdp-profile /vendor/bin/vendor.meizu.qdp-profile
+    class core
+    user radio
+    group radio
