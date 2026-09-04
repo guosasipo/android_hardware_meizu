@@ -1,0 +1,17 @@
+//
+// SPDX-FileCopyrightText: 2026 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+android_app {
+    name: "MeizuImsConfig",
+    srcs: ["src/**/*.kt"],
+    certificate: "platform",
+    platform_apis: true,
+    privileged: true,
+    privapp_allowlist: "privapp-permissions-org.lineageos.meizu.imsconfig.xml",
+    system_ext_specific: true,
+    optimize: {
+        optimize: true,
+    },
+}
