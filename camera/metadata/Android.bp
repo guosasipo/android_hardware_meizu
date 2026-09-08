@@ -1,0 +1,20 @@
+//
+// SPDX-FileCopyrightText: The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_library_shared {
+    name: "libcamera_metadata_meizu",
+    srcs: ["CameraMetadata.cpp"],
+    shared_libs: [
+        "libcamera_metadata",
+        "libdl",
+    ],
+    vendor: true,
+    compile_multilib: "64",
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+}
