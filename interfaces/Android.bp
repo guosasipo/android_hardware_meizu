@@ -32,3 +32,34 @@ aidl_interface {
         },
     ],
 }
+
+aidl_interface {
+    name: "vendor.meizu.hardware.aw_light",
+    owner: "meizu",
+    vendor_available: true,
+    local_include_dir: "aidl",
+    srcs: ["aidl/vendor/meizu/hardware/aw_light/*.aidl"],
+    stability: "vintf",
+    frozen: true,
+    backend: {
+        cpp: {
+            enabled: false,
+        },
+        java: {
+            sdk_version: "module_current",
+        },
+        ndk: {
+            enabled: true,
+        },
+        rust: {
+            enabled: false,
+        },
+    },
+    versions_with_info: [
+        {
+            version: "1",
+            imports: [],
+        },
+    ],
+
+}
