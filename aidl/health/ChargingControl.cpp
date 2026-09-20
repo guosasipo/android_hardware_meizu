@@ -115,9 +115,9 @@ bool ChargingControl::setLimit(int start, int end) {
         return false;
     }
 
-    int actualEnabled;
-    int actualStart;
-    int actualEnd;
+    int actualEnabled = -1;
+    int actualStart = -1;
+    int actualEnd = -1;
     if (!readInt(kEnabledPath, &actualEnabled) || !readInt(kStartPath, &actualStart) ||
         !readInt(kEndPath, &actualEnd) || actualEnabled != 1 || actualStart != start ||
         actualEnd != end) {
