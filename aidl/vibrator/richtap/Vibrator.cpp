@@ -9,57 +9,46 @@
 #include <log/log.h>
 
 #include <algorithm>
-#include <array>
+#include <cerrno>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
 
 #include "AacVibrator.h"
+#include "HapticEffects.h"
 
 namespace aidl::android::hardware::vibrator {
 namespace {
-
-constexpr std::array<int32_t, 35> kRawTextureTick = {
-        0x1,  0x1001, 0x0,   0x32, 0x21, 0x1d, 0x0,    0x0,  0x0,  0xc,  0x3b, 0x0,
-        0x16, 0x4b,   -0x15, 0x1d, 0x0,  0x0,  0x1001, 0x1e, 0x64, 0x1e, 0x0,  0x0,
-        0x0,  0x0,    0x0,   0x0,  0x0,  0x0,  0x0,    0x0,  0x0,  0x0,  0x0,
-};
 
 constexpr int32_t kRawLoopCount = 1;
 constexpr int32_t kRawIntervalMs = 0;
 constexpr int32_t kRawFrequency = 0;
 constexpr int32_t kMaxAacAmplitude = 255;
-constexpr int32_t kFallbackDurationMs = 30;
-constexpr uint32_t kRichTapPrebakedEffectBase = 0x1000;
-constexpr int32_t kLightStrength = 69;
-constexpr int32_t kMediumStrength = 89;
-constexpr int32_t kStrongStrength = 99;
+constexpr int32_t kCompositionDelayMaxMs = 1000;
+constexpr float kMinimumScale = 0.1f;
 
-bool isNativePrebaked(Effect effect) {
-    switch (effect) {
-        case Effect::CLICK:
-        case Effect::DOUBLE_CLICK:
-        case Effect::TICK:
-        case Effect::THUD:
-        case Effect::POP:
-        case Effect::HEAVY_CLICK:
-            return true;
-        default:
-            return false;
-    }
-}
-
-int32_t toAacStrength(EffectStrength strength) {
+float toScale(EffectStrength strength) {
     switch (strength) {
         case EffectStrength::LIGHT:
-            return kLightStrength;
+            return 0.5f;
         case EffectStrength::MEDIUM:
-            return kMediumStrength;
+            return 0.75f;
         case EffectStrength::STRONG:
-            return kStrongStrength;
+            return 1.0f;
     }
     return 0;
+}
+
+void appendPattern(std::vector<int32_t>& output, const meizu::haptics::Pattern& pattern,
+                   int32_t offsetMs, float scale) {
+    for (size_t i = 0; i < pattern.size; ++i) {
+        auto event = pattern.events[i];
+        event[1] += offsetMs;
+        event[2] = std::max(
+                1, static_cast<int32_t>(std::lround(event[2] * std::max(scale, kMinimumScale))));
+        output.insert(output.end(), event.begin(), event.end());
+    }
 }
 
 ndk::ScopedAStatus unsupported() {
@@ -96,7 +85,7 @@ ndk::ScopedAStatus Vibrator::getCapabilities(int32_t* _aidl_return) {
     }
 
     *_aidl_return = IVibrator::CAP_ON_CALLBACK | IVibrator::CAP_PERFORM_CALLBACK |
-                    IVibrator::CAP_AMPLITUDE_CONTROL;
+                    IVibrator::CAP_AMPLITUDE_CONTROL | IVibrator::CAP_COMPOSE_EFFECTS;
     return ndk::ScopedAStatus::ok();
 }
 
@@ -134,24 +123,23 @@ ndk::ScopedAStatus Vibrator::perform(Effect effect, EffectStrength strength,
         return unsupported();
     }
 
-    int32_t result;
-    if (isNativePrebaked(effect)) {
-        result = mAacVibrator->performSystemPrebaked(
-                kRichTapPrebakedEffectBase + static_cast<uint32_t>(effect),
-                toAacStrength(strength));
-    } else if (effect == Effect::TEXTURE_TICK) {
-        result = mAacVibrator->post(kRawTextureTick.data(), kRawTextureTick.size(), kRawIntervalMs,
-                                    kRawLoopCount, kMaxAacAmplitude, kRawFrequency);
-    } else {
+    const auto* pattern = meizu::haptics::getPattern(effect);
+    if (pattern == nullptr) {
         return unsupported();
     }
 
-    if (result < 0) {
+    std::vector<int32_t> output;
+    output.reserve(1 + pattern->size * meizu::haptics::Event{}.size());
+    output.push_back(meizu::haptics::kFormat);
+    appendPattern(output, *pattern, 0, toScale(strength));
+    const int32_t result = mAacVibrator->post(output.data(), output.size(), kRawIntervalMs,
+                                              kRawLoopCount, kMaxAacAmplitude, kRawFrequency);
+    if (result <= 0) {
         ALOGE("AAC effect %d failed: %d", static_cast<int32_t>(effect), result);
-        return backendError(result);
+        return backendError(result < 0 ? result : -EIO);
     }
 
-    *_aidl_return = result > 0 ? result : kFallbackDurationMs;
+    *_aidl_return = std::max(result, pattern->durationMs);
     mAacVibrator->scheduleCompletion(*_aidl_return, makeCompletion(callback));
     return ndk::ScopedAStatus::ok();
 }
@@ -187,30 +175,84 @@ ndk::ScopedAStatus Vibrator::setExternalControl(bool /* enabled */) {
     return unsupported();
 }
 
-ndk::ScopedAStatus Vibrator::getCompositionDelayMax(int32_t* /* maxDelayMs */) {
-    return unsupported();
+ndk::ScopedAStatus Vibrator::getCompositionDelayMax(int32_t* maxDelayMs) {
+    if (maxDelayMs == nullptr) {
+        return illegalArgument();
+    }
+    *maxDelayMs = kCompositionDelayMaxMs;
+    return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::getCompositionSizeMax(int32_t* /* maxSize */) {
-    return unsupported();
+ndk::ScopedAStatus Vibrator::getCompositionSizeMax(int32_t* maxSize) {
+    if (maxSize == nullptr) {
+        return illegalArgument();
+    }
+    *maxSize = meizu::haptics::kMaxEvents;
+    return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Vibrator::getSupportedPrimitives(std::vector<CompositePrimitive>* supported) {
     if (supported == nullptr) {
         return illegalArgument();
     }
-    supported->clear();
+    supported->assign(meizu::haptics::kSupportedPrimitives.begin(),
+                      meizu::haptics::kSupportedPrimitives.end());
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::getPrimitiveDuration(CompositePrimitive /* primitive */,
-                                                  int32_t* /* durationMs */) {
-    return unsupported();
+ndk::ScopedAStatus Vibrator::getPrimitiveDuration(CompositePrimitive primitive,
+                                                  int32_t* durationMs) {
+    if (durationMs == nullptr) {
+        return illegalArgument();
+    }
+    const auto* pattern = meizu::haptics::getPattern(primitive);
+    if (pattern == nullptr) {
+        return unsupported();
+    }
+    *durationMs = pattern->durationMs;
+    return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect>& /* composite */,
-                                     const std::shared_ptr<IVibratorCallback>& /* callback */) {
-    return unsupported();
+ndk::ScopedAStatus Vibrator::compose(const std::vector<CompositeEffect>& composite,
+                                     const std::shared_ptr<IVibratorCallback>& callback) {
+    if (composite.empty() || composite.size() > meizu::haptics::kMaxEvents) {
+        return illegalArgument();
+    }
+    for (const auto& effect : composite) {
+        if (effect.delayMs < 0 || effect.delayMs > kCompositionDelayMaxMs ||
+            !std::isfinite(effect.scale) || effect.scale < 0.0f || effect.scale > 1.0f) {
+            return illegalArgument();
+        }
+        if (meizu::haptics::getPattern(effect.primitive) == nullptr) {
+            return unsupported();
+        }
+    }
+
+    std::vector<int32_t> output;
+    output.reserve(1 + composite.size() * meizu::haptics::Event{}.size());
+    output.push_back(meizu::haptics::kFormat);
+    int32_t durationMs = 0;
+    int32_t lastEventEndMs = 0;
+    for (const auto& effect : composite) {
+        const auto& pattern = *meizu::haptics::getPattern(effect.primitive);
+        durationMs += effect.delayMs;
+        appendPattern(output, pattern, durationMs, effect.scale);
+        durationMs += pattern.durationMs;
+        if (pattern.size != 0) {
+            lastEventEndMs = durationMs;
+        }
+    }
+    if (output.size() > 1) {
+        const int32_t result = mAacVibrator->post(output.data(), output.size(), kRawIntervalMs,
+                                                  kRawLoopCount, kMaxAacAmplitude, kRawFrequency);
+        if (result <= 0) {
+            ALOGE("AAC composition failed: %d", result);
+            return backendError(result < 0 ? result : -EIO);
+        }
+        durationMs = std::max(durationMs, result + durationMs - lastEventEndMs);
+    }
+    mAacVibrator->scheduleCompletion(durationMs, makeCompletion(callback));
+    return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Vibrator::getSupportedAlwaysOnEffects(std::vector<Effect>* /* _aidl_return */) {
