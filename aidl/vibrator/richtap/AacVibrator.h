@@ -34,7 +34,6 @@ class AacVibrator final {
     int32_t setDynamicScale(uint8_t scale);
     int32_t setF0(int32_t f0);
     int32_t performPrebaked(uint32_t effectId, int32_t strength);
-    int32_t performSystemPrebaked(uint32_t effectId, int32_t strength);
     int32_t performEnvelope(const int32_t* envelope, size_t envelopeSize, bool fastFlag);
     int32_t performRtp(int32_t fd);
     bool performParam(int32_t interval, int32_t amplitude, int32_t frequency);

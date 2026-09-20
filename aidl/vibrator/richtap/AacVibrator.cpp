@@ -86,16 +86,6 @@ int32_t AacVibrator::setF0(int32_t f0) {
     return aac_vibra_setting_f0(0, f0);
 }
 
-int32_t AacVibrator::performSystemPrebaked(uint32_t effectId, int32_t strength) {
-    std::lock_guard lock(mMutex);
-
-    const int32_t amplitudeResult = aac_vibra_setAmplitude(std::numeric_limits<uint8_t>::max());
-    if (amplitudeResult != 0) {
-        return amplitudeResult;
-    }
-    return aac_vibra_looper_prebaked_effect(effectId, strength);
-}
-
 int32_t AacVibrator::performPrebaked(uint32_t effectId, int32_t strength) {
     std::lock_guard lock(mMutex);
     return aac_vibra_looper_prebaked_effect(effectId, strength);
