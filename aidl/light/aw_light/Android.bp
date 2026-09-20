@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: Apache-2.0
+
+cc_library_static {
+    name: "libaw_light",
+    vendor: true,
+    srcs: [
+        "AwLight.cpp",
+        "Aw20072.cpp",
+        "Controller.cpp",
+        "AwLightService.cpp",
+    ],
+    export_include_dirs: ["."],
+    shared_libs: [
+        "libjsoncpp",
+        "libbase",
+        "libbinder_ndk",
+        "android.system.suspend-V1-ndk",
+        "vendor.meizu.hardware.aw_light-V1-ndk",
+    ],
+    export_shared_lib_headers: [
+        "libbinder_ndk",
+        "vendor.meizu.hardware.aw_light-V1-ndk",
+    ],
+    cpp_std: "c++20",
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+}
