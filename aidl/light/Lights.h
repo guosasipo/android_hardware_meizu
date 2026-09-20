@@ -37,7 +37,6 @@ class Lights : public BnLights {
 
   private:
     bool initialize();
-    bool setAwState(const HwLightState& state);
     bool setBacklightState(const HwLightState& state);
     bool setPmicState(const HwLightState& state);
     bool updateNotificationState();
@@ -47,9 +46,7 @@ class Lights : public BnLights {
 
     bool mReady = false;
     bool mBacklightAvailable = false;
-    bool mAwAvailable = false;
     bool mPmicAvailable = false;
-    int mAwEffect = -1;
     HwLightState mBatteryState;
     HwLightState mNotificationsState;
     HwLightState mAttentionState;

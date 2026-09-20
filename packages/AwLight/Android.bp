@@ -1,0 +1,55 @@
+// SPDX-FileCopyrightText: 2026 The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+
+android_app {
+    name: "AwLight",
+    srcs: ["src/**/*.java"],
+    platform_apis: true,
+    certificate: "platform",
+    privileged: true,
+    system_ext_specific: true,
+    static_libs: [
+        "vendor.meizu.hardware.aw_light-V1-java",
+        "com.google.android.material_material",
+        "SettingsLib",
+        "androidx.preference_preference",
+        "androidx-constraintlayout_constraintlayout",
+        "lottie",
+    ],
+    asset_dirs: ["meizu21Pro/assets"],
+    required: [
+        "android.hardware.light-service.meizu",
+        "aw_light_effects",
+        "aw_light_firmware",
+        "whitelist_org.meizu.awlight.xml",
+        "privapp-permissions-org.meizu.awlight.xml",
+    ],
+}
+
+prebuilt_etc {
+    name: "aw_light_effects",
+    vendor: true,
+    src: "meizu21Pro/config/effects.json",
+    filename: "effects.json",
+    relative_install_path: "meizu-lights",
+}
+
+prebuilt_firmware {
+    name: "aw_light_firmware",
+    vendor: true,
+    srcs: ["meizu21Pro/firmware/*.bin"],
+}
+
+prebuilt_etc {
+    name: "privapp-permissions-org.meizu.awlight.xml",
+    src: "permissions/privapp-permissions-org.meizu.awlight.xml",
+    sub_dir: "permissions",
+    system_ext_specific: true,
+}
+
+prebuilt_etc {
+    name: "whitelist_org.meizu.awlight.xml",
+    src: "permissions/whitelist_org.meizu.awlight.xml",
+    sub_dir: "sysconfig",
+    system_ext_specific: true,
+}
