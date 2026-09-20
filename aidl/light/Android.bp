@@ -19,10 +19,14 @@ cc_binary {
         "Lights.cpp",
         "service.cpp",
     ],
+    static_libs: ["libaw_light"],
     shared_libs: [
         "android.hardware.light-V2-ndk",
         "libbase",
         "libbinder_ndk",
         "liblog",
+        "libjsoncpp",
+        "android.system.suspend-V1-ndk",
+        "vendor.meizu.hardware.aw_light-V1-ndk",
     ],
 }

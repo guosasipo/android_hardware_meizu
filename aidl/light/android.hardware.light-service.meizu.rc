@@ -3,3 +3,4 @@ service vendor.light-default /vendor/bin/hw/android.hardware.light-service.meizu
     user system
     group system
     shutdown critical
+    onrestart write /sys/class/leds/aw20072_led/effect 0

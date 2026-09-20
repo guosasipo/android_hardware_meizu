@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <FrameLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@drawable/preview_background" android:clipToOutline="true">
+        <ImageView android:id="@+id/main_preview_first"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:scaleType="fitCenter" android:adjustViewBounds="true"
+            android:importantForAccessibility="no" />
+        <TextureView android:id="@+id/main_preview_video"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:alpha="0" android:importantForAccessibility="no" />
+        <ImageView android:id="@+id/main_preview_last"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:scaleType="fitCenter" android:visibility="invisible"
+            android:importantForAccessibility="no" />
+        <ImageView android:id="@+id/main_preview_ring"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:scaleType="fitCenter" android:visibility="invisible"
+            android:importantForAccessibility="no" />
+        <TextView android:id="@+id/main_preview_error"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:gravity="center"
+            android:text="@string/preview_unavailable" android:visibility="gone"
+            android:textAppearance="?android:attr/textAppearanceListItemSecondary" />
+    </FrameLayout>
+</FrameLayout>

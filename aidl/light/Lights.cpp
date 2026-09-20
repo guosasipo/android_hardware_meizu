@@ -17,11 +17,9 @@
 
 #include <unistd.h>
 #include <algorithm>
-#include <array>
 #include <cerrno>
 #include <chrono>
 #include <cstdio>
-#include <limits>
 #include <string>
 #include <thread>
 
@@ -32,24 +30,8 @@ using namespace std::chrono_literals;
 
 constexpr char kBacklightPath[] = "/sys/class/backlight/panel0-backlight/brightness";
 constexpr char kBacklightMaxPath[] = "/sys/class/backlight/panel0-backlight/max_brightness";
-constexpr char kAwEffectPath[] = "/sys/class/leds/aw20072_led/effect";
-constexpr char kAwAllLightPath[] = "/sys/class/leds/aw20072_led/all_light";
 constexpr int kInitRetries = 200;
 constexpr useconds_t kInitDelayUs = 10000;
-
-struct AwColor {
-    int effect;
-    int red;
-    int green;
-    int blue;
-};
-
-constexpr std::array kBreathColors = {
-        AwColor{6, 255, 255, 255}, AwColor{7, 255, 0, 0},      AwColor{8, 0, 255, 0},
-        AwColor{9, 0, 0, 255},     AwColor{10, 255, 128, 0},   AwColor{11, 255, 255, 0},
-        AwColor{12, 255, 64, 128}, AwColor{13, 128, 255, 128}, AwColor{14, 0, 255, 255},
-        AwColor{15, 128, 0, 255},
-};
 
 bool readInt(const std::string& path, int* value) {
     std::string content;
@@ -75,35 +57,6 @@ bool pathExists(const std::string& path) {
 
 std::string ledPath(const std::string& name, const std::string& node) {
     return "/sys/class/leds/" + name + "/" + node;
-}
-
-int nearestEffect(const Color& color) {
-    const int maximum = std::max({color.red, color.green, color.blue});
-    if (maximum == 0) {
-        return 0;
-    }
-
-    const int red = color.red * 255 / maximum;
-    const int green = color.green * 255 / maximum;
-    const int blue = color.blue * 255 / maximum;
-    int bestEffect = 0;
-    int bestDistance = std::numeric_limits<int>::max();
-
-    const auto compare = [&](const AwColor& candidate) {
-        const int deltaRed = red - candidate.red;
-        const int deltaGreen = green - candidate.green;
-        const int deltaBlue = blue - candidate.blue;
-        const int distance = deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue;
-        if (distance < bestDistance) {
-            bestDistance = distance;
-            bestEffect = candidate.effect;
-        }
-    };
-
-    for (const auto& candidate : kBreathColors) {
-        compare(candidate);
-    }
-    return bestEffect;
 }
 
 bool setPmicChannel(const std::string& name, uint8_t brightness, const HwLightState& state) {
@@ -171,7 +124,7 @@ Lights::Lights() {
         });
     };
     addLight(LightType::BACKLIGHT);
-    if (mAwAvailable || mPmicAvailable) {
+    if (mPmicAvailable) {
         addLight(LightType::BATTERY);
         addLight(LightType::NOTIFICATIONS);
         addLight(LightType::ATTENTION);
@@ -188,11 +141,10 @@ bool Lights::initialize() {
     for (int retry = 0; retry < kInitRetries; ++retry) {
         mBacklightAvailable =
                 access(kBacklightPath, W_OK) == 0 && access(kBacklightMaxPath, R_OK) == 0;
-        mAwAvailable = access(kAwEffectPath, W_OK) == 0 && access(kAwAllLightPath, W_OK) == 0;
         mPmicAvailable = access("/sys/class/leds/red/brightness", W_OK) == 0 &&
                          access("/sys/class/leds/green/brightness", W_OK) == 0 &&
                          access("/sys/class/leds/blue/brightness", W_OK) == 0;
-        if (mBacklightAvailable && mAwAvailable && mPmicAvailable) {
+        if (mBacklightAvailable && mPmicAvailable) {
             return true;
         }
         usleep(kInitDelayUs);
@@ -232,41 +184,6 @@ bool Lights::setBacklightState(const HwLightState& state) {
     return writeInt(kBacklightPath, brightness);
 }
 
-bool Lights::setAwState(const HwLightState& state) {
-    if (!mAwAvailable) {
-        return false;
-    }
-    const Color color = colorFromState(state);
-    const int maximum = std::max({color.red, color.green, color.blue});
-
-    if (!color.isLit() || state.flashMode == FlashMode::NONE) {
-        int brightness = 0;
-        int rgb = 0;
-        if (maximum > 0) {
-            brightness = std::max(1, (maximum * 63 + 254) / 255);
-            const int red = color.red * 255 / maximum;
-            const int green = color.green * 255 / maximum;
-            const int blue = color.blue * 255 / maximum;
-            rgb = (red << 16) | (green << 8) | blue;
-        }
-        char command[32];
-        snprintf(command, sizeof(command), "%d %06x", brightness, rgb);
-        const bool success = writeString(kAwAllLightPath, command);
-        mAwEffect = -1;
-        return success;
-    }
-
-    const int effect = nearestEffect(color);
-    if (effect == mAwEffect) {
-        return true;
-    }
-    if (!writeInt(kAwEffectPath, effect)) {
-        return false;
-    }
-    mAwEffect = effect;
-    return true;
-}
-
 bool Lights::setPmicState(const HwLightState& state) {
     if (!mPmicAvailable) {
         return false;
@@ -296,13 +213,6 @@ bool Lights::updateNotificationState() {
         attempted = true;
         if (!setPmicState(*state)) {
             LOG(ERROR) << "Failed to update PMIC notification LEDs";
-            success = false;
-        }
-    }
-    if (mAwAvailable) {
-        attempted = true;
-        if (!setAwState(*state)) {
-            LOG(ERROR) << "Failed to update AW20072 notification ring";
             success = false;
         }
     }
@@ -356,7 +266,6 @@ binder_status_t Lights::dump(int fd, const char** /* args */, uint32_t /* numArg
     std::lock_guard lock(mMutex);
     dprintf(fd, "Meizu Lights ready: %s\n", mReady ? "true" : "false");
     dprintf(fd, "Backlight available: %s\n", mBacklightAvailable ? "true" : "false");
-    dprintf(fd, "AW20072 available: %s\n", mAwAvailable ? "true" : "false");
     dprintf(fd, "PMIC LEDs available: %s\n", mPmicAvailable ? "true" : "false");
     for (const auto& light : mLights) {
         dprintf(fd, "Light %d: %s\n", light.id, toString(light.type).c_str());

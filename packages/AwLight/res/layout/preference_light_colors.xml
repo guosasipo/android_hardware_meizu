@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <TextView
+        android:id="@android:id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/settingslib_expressive_space_small1"
+        android:textAppearance="?android:attr/textAppearanceListItem" />
+    <view class="org.meizu.awlight.preference.LightColorPreference$ColorGrid"
+        android:id="@+id/light_color_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/settingslib_expressive_space_extrasmall4"
+        android:layout_marginBottom="@dimen/settingslib_expressive_space_small1" />
+</LinearLayout>
