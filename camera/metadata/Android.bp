@@ -6,6 +6,7 @@
 cc_library_shared {
     name: "libcamera_metadata_meizu",
     srcs: ["CameraMetadata.cpp"],
+    header_libs: ["libcutils_headers"],
     shared_libs: [
         "libcamera_metadata",
         "libdl",
